@@ -91,10 +91,15 @@ function* getPermutations(chars) {
         else 
             for (var i = 0; i <= n; i++) {
                 yield* HeapsAlgorithm(n - 1, arr);
-                if (n % 2) 
-                    [arr[i], arr[n]] = [arr[n], arr[i]]; 
-                else                     
-                    [arr[0], arr[n]] = [arr[n], arr[0]];
+                if (n % 2) {
+                    var temp = arr[i];
+                    arr[i] = arr[n];
+                    arr[n] = temp;
+                } else {
+                    var temp = arr[0];
+                    arr[0] = arr[n];
+                    arr[n] = temp;
+                }
             }
     }
 

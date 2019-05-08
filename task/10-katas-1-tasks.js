@@ -104,7 +104,7 @@ function* expandBraces(str) {
         if (matched != null) 
             for (var viscera of matched[1].split(',')) 
                 toExpand.push(str.replace(matched[0], viscera));
-        else if (!appeared.includes(str)) {
+        else if (!appeared[].includes(str)) {
                 appeared.push(str);
                 yield str;
         }

@@ -95,6 +95,11 @@ function createCompassPoints() {
  *   'nothing to do' => 'nothing to do'
  */
 function* expandBraces(str) {
+    Array.includes = function () {
+        let [first, ...rest] = arguments;
+        return Array.prototype.includes.apply(first, rest);
+    }
+
     var toExpand = [str];
     var appeared = new Array();
 
@@ -104,7 +109,7 @@ function* expandBraces(str) {
         if (matched != null) 
             for (var viscera of matched[1].split(',')) 
                 toExpand.push(str.replace(matched[0], viscera));
-        else if (!appeared[].includes(str)) {
+        else if (!appeared.includes(str)) {
                 appeared.push(str);
                 yield str;
         }

@@ -17,8 +17,47 @@
  *  ]
  */
 function createCompassPoints() {
-    throw new Error('Not implemented');
-    var sides = ['N','E','S','W'];  // use array of cardinal directions only!
+    var sides = ['N', 'E', 'S', 'W'];  // use array of cardinal directions only!
+
+    var result = new Array();
+    var curSide, nextSide, midSide, abbreviation;
+    for (var sideId = 0; sideId < sides.length; sideId++) {
+        curSide = sides[sideId];
+        nextSide = sides[(sideId + 1) % sides.length];
+        midSide = (sideId % 2 == 0) ? curSide + nextSide : nextSide + curSide;
+        for (var compassPoint = 0; compassPoint < 8; compassPoint++) {
+            switch (compassPoint) {
+                case 0:
+                    abbreviation = curSide;
+                    break;
+                case 1:
+                    abbreviation = curSide + 'b' + nextSide;
+                    break;
+                case 2:
+                    abbreviation = curSide + midSide;
+                    break;
+                case 3:
+                    abbreviation = midSide + 'b' + curSide;
+                    break;
+                case 4:
+                    abbreviation = midSide;
+                    break;
+                case 5:
+                    abbreviation = midSide + 'b' + nextSide;
+                    break;
+                case 6:
+                    abbreviation = nextSide + midSide;
+                    break;
+                case 7:
+                    abbreviation = nextSide + 'b' + curSide;
+                    break;
+                default:
+                    break;
+            }
+            result.push({ abbreviation: abbreviation, azimuth: (sideId * 8 + compassPoint) * 11.25 });
+        }
+    }
+    return result;
 }
 
 
@@ -56,7 +95,20 @@ function createCompassPoints() {
  *   'nothing to do' => 'nothing to do'
  */
 function* expandBraces(str) {
-    throw new Error('Not implemented');
+    var toExpand = [str];
+    var appeared = new Array();
+
+    while (toExpand.length > 0) {
+        str = toExpand.pop();
+        var matched = str.match(/{([^{}]*)}/);
+        if (matched != null) 
+            for (var viscera of matched[1].split(',')) 
+                toExpand.push(str.replace(matched[0], viscera));
+        else if (!appeared.includes(str)) {
+                appeared.push(str);
+                yield str;
+        }
+    }
 }
 
 
@@ -88,7 +140,32 @@ function* expandBraces(str) {
  *
  */
 function getZigZagMatrix(n) {
-    throw new Error('Not implemented');
+    var result = new Array(n);
+    for (var i = 0; i < n; i++) {
+        result[i] = new Array(n);
+    }
+
+    var maxValue = Math.pow(n, 2);
+    var i = 0, j = 0;
+    for (var value = 0; value < maxValue; value++) {
+        result[i][j] = value;
+        if ((i + j) % 2 == 0) {
+            if (j + 1 < n)
+                j++;
+            else
+                i += 2;
+            if (i > 0)
+                i--;
+        } else {
+            if (i + 1 < n)
+                i++;
+            else
+                j += 2;
+            if (j > 0)
+                j--;
+        }
+    }
+    return result;
 }
 
 
@@ -113,7 +190,27 @@ function getZigZagMatrix(n) {
  *
  */
 function canDominoesMakeRow(dominoes) {
-    throw new Error('Not implemented');
+    var valuesCount = new Array(7).fill(0);
+    var doubleExists = new Array(7).fill(false);
+    for (var domino of dominoes) {
+        for (var value of domino)
+            valuesCount[value]++;
+
+        if (domino[0] == domino[1])
+            doubleExists[domino[0]] = true;
+    }
+    for (var i = 0; i < 7; i++)
+        if ((valuesCount[i] == 2) && doubleExists[i])
+            return false
+
+    var oddCount = 0;
+    for (var value of valuesCount)
+        oddCount += value % 2;
+
+    if ((oddCount == 0) || (oddCount == 2))
+        return true;
+    else
+        return false;
 }
 
 
@@ -137,7 +234,27 @@ function canDominoesMakeRow(dominoes) {
  * [ 1, 2, 4, 5]          => '1,2,4,5'
  */
 function extractRanges(nums) {
-    throw new Error('Not implemented');
+    var curMin, curMax;
+    var result = String();
+    while (nums.length > 0) {
+        curMin = nums.shift();
+        curMax = curMin;
+        while ((nums.length > 0) && (nums[0] - curMax == 1))
+            curMax = nums.shift();
+
+        switch (curMax - curMin) {
+            case 0:
+                result = result.concat(curMin.toString(), ',');
+                break
+            case 1:
+                result = result.concat(curMin.toString(), ',', curMax.toString(), ',');
+                break;
+            default:
+                result = result.concat(curMin.toString(), '-', curMax.toString(), ',');
+                break;
+        }
+    }
+    return result.slice(0, -1);
 }
 
 module.exports = {

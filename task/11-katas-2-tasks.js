@@ -34,32 +34,7 @@
  *
  */
 function parseBankAccount(bankAccount) {
-    var numAssocArray = Array(10);
-    for (var i = 0; i < numAssocArray.length; i++) {
-        numAssocArray[i] = Array(3);
-    }
-    var tpl1 = ' _     _  _     _  _  _  _  _ ';
-    var tpl2 = '| |  | _| _||_||_ |_   ||_||_|';
-    var tpl3 = '|_|  ||_  _|  | _||_|  ||_| _|';
-    for (i = 0; i < numAssocArray.length; i++) {
-        numAssocArray[i][0] = tpl1.substr(i * 3, 3);
-        numAssocArray[i][1] = tpl2.substr(i * 3, 3);
-        numAssocArray[i][2] = tpl3.substr(i * 3, 3);
-    }
-
-    var lines = bankAccount.split('\n');
-    var result = 0;
-    var index;
-    for (i = 0; i < lines[0].length; i += 3) {
-        for (let j = 0; j < numAssocArray.length; j++) 
-            if ((lines[0].substr(i, 3) == numAssocArray[j][0]) &&
-                (lines[1].substr(i, 3) == numAssocArray[j][1]) &&
-                (lines[2].substr(i, 3) == numAssocArray[j][2])) 
-                index = j;
-
-        result = result * 10 + index;
-    }
-    return result;
+    throw new Error('Not implemented');
 }
 
 
@@ -88,15 +63,7 @@ function parseBankAccount(bankAccount) {
  *                                                                                                'characters.'
  */
 function* wrapText(text, columns) {
-    var words = text.split(' ');
-    var line;
-    while (words.length > 0) {
-        line = words.shift();
-        while ((words.length > 0) && (line.length + words[0].length < columns))
-            line += ' ' + words.shift();
-
-        yield line;
-    }
+    throw new Error('Not implemented');
 }
 
 
@@ -132,144 +99,8 @@ const PokerRank = {
     HighCard: 0
 }
 
-function IsStraight(cards) {
-    var values = Array();
-
-    for (var card of cards) {
-        switch (card['name']) {
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case '10':
-                values.push(Number.parseInt(card['name']));
-                break;
-            case 'J':
-                values.push(11);
-                break;
-            case 'Q':
-                values.push(12);
-                break;
-            case 'K':
-                values.push(13);
-                break;
-        }
-    }
-    values = values.sort((a, b) => b - a);
-
-    for (var i = 0; i < values.length - 1; i++)
-        if (values[i] - values[i + 1] != 1)
-            return false;
-
-    if ((values.length == 4) && !((values[0] == 13) || (values[3] == 2)))
-        return false;
-
-    return true; 
-}
-
-function IsFlush(cards) {
-    for (var i = 1; i < cards.length; i++)
-        if (cards[0]['suit'] != cards[i]['suit'])
-            return false;
-
-    return true;
-}
-
-function IsStraightFlush(cards) {
-    return IsStraight(cards) && IsFlush(cards);
-}
-
-function IsFullHouse(cards) {
-    var counter = 0;
-    var remainingCards;
-    for (var i = 0; (i < 3) && (counter != 3); i++) {
-        counter = 1;
-        for (var j = i + 1; j < cards.length; j++)
-            if (cards[i]['name'] == cards[j]['name'])
-                counter++;
-        
-        if (counter == 3)
-            remainingCards = cards.filter(card => card['name'] != cards[i]['name']);
-        else if (counter > 3)
-            return false;
-    }
-    if ((counter == 3) && (remainingCards[0]['name'] == remainingCards[1]['name'])) {
-        return true;
-    }
-    return false;
-}
-
-function ParseCard(card) {
-    var matched = card.match(/([JQKA\d]+)(.)/);
-    var result = new Array();
-    result['name'] = matched[1];
-    result['suit'] = matched[2];
-    return result;
-}
-
-function GetMaxOfKind(cards) {
-    var oneOfKindArray = new Array();
-    var maxOfKind = 0;
-    for (var card of cards) {
-        if (oneOfKindArray[card['name']] === undefined) {
-            oneOfKindArray[card['name']] = 1;
-        } else {
-            oneOfKindArray[card['name']]++;
-        }
-        maxOfKind = Math.max(maxOfKind, oneOfKindArray[card['name']]);
-    }
-    return maxOfKind;
-}
-
-function GetPairsCount(cards) {
-    var nameCountArray = Array();
-    var numOfPairs = 0;
-    for (var card of cards) {
-        if (nameCountArray[card['name']] === undefined)
-            nameCountArray[card['name']] = 1;
-        else if (++nameCountArray[card['name']] == 2)
-                numOfPairs++;
-    }
-    return numOfPairs;
-}
-
 function getPokerHandRank(hand) {
-    var cards = new Array(hand.length);
-    for (let i = 0; i < hand.length; i++) {
-        cards[i] = ParseCard(hand[i]);
-    }
-
-    if (IsStraightFlush(cards)) {
-        return PokerRank.StraightFlush;
-    }
-    else if (GetMaxOfKind(cards) == 4) {
-        return PokerRank.FourOfKind;
-    }
-    else if (IsFullHouse(cards)) {
-        return PokerRank.FullHouse;
-    }
-    else if (IsFlush(cards)) {
-        return PokerRank.Flush;
-    }
-    else if (IsStraight(cards)) {
-        return PokerRank.Straight;
-    }
-    else if (GetMaxOfKind(cards) == 3) {
-        return PokerRank.ThreeOfKind;
-    }
-    else if (GetPairsCount(cards) == 2) {
-        return PokerRank.TwoPairs;
-    }
-    else if (GetPairsCount(cards) == 1) {
-        return PokerRank.OnePair;
-    }
-    else
-        return PokerRank.HighCard; 
+    throw new Error('Not implemented');
 }
 
 
@@ -303,47 +134,8 @@ function getPokerHandRank(hand) {
  *    '|             |\n'+              '+-----+\n'           '+-------------+\n'
  *    '+-------------+\n'
  */
-
-function GetRectangle(figure, row, column) {
-    for (var i = row + 1; i < figure.length; i++) 
-        if (figure[i][column] == '+') 
-            for (var j = column + 1; j < figure[row].length; j++) {
-                if (figure[i][j] == "+") {
-                    if (figure[row][j] == "+") {
-                        var f1 = true;
-                        for (var k = row + 1; (k < i) && f1; k++) 
-                            if (figure[k][j] != '|')
-                                f1 = false;
-
-                        if (f1) 
-                            return [i - row + 1, j - column + 1];                        
-                    }
-                } else if (figure[i][j] != '-') 
-                    break;
-            }
-        else if (figure[i][column] != '|') 
-            break;
-
-    return null;
-}
-
-function DrawRectangle(width, height) {
-    return '+' + '-'.repeat(width - 2) + '+\n'
-        + ('|' + ' '.repeat(width - 2) + '|\n').repeat(height - 2)
-        + '+' + '-'.repeat(width - 2) + '+\n';
-}
-
 function* getFigureRectangles(figure) {
-    var figureArr = figure.split('\n');
-    
-    for (var i = 0; i < figureArr.length; i++)
-        for (var j = 0; j < figureArr[i].length; j++)
-            if (figureArr[i][j] == '+') {
-                var rectangle = GetRectangle(figureArr, i, j);
-                if (rectangle != null)
-                    yield DrawRectangle(rectangle[1], rectangle[0]);
-               
-            }
+   throw new Error('Not implemented');
 }
 
 
